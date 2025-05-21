@@ -8,9 +8,9 @@
 	<artifactId>jdt-codemining-update-site</artifactId>
 	<packaging>eclipse-repository</packaging>
 	<scm>
-		<url>https://github.com/angelozerr/jdt-codemining</url>
-		<connection>scm:git:https://github.com/angelozerr/jdt-codemining.git</connection>
-		<developerConnection>scm:git:https://github.com/angelozerr/jdt-codemining.git</developerConnection>
+		<url>https://github.com/SeineEloquenz/jdt-codemining</url>
+		<connection>scm:git:https://github.com/SeineEloquenz/jdt-codemining.git</connection>
+		<developerConnection>scm:git:https://github.com/SeineEloquenz/jdt-codemining.git</developerConnection>
 	</scm>
 	<properties>
 		<url.suffix>snapshot</url.suffix>
@@ -26,70 +26,175 @@
 		</extensions>
 	</build>
 	<profiles>
-		<!-- This profile is used to upload the repo -->
 		<profile>
-			<id>uploadRepo</id>
-			<properties>
-				<!-- Properties relative to the distant host where to upload the repo -->
-				<ftp.url>ftp://ftp.online.net</ftp.url>
-				<ftp.toDir>/oss/jdt-codemining/${url.suffix}</ftp.toDir>
-				<!-- Relative path to the repo being uploaded -->
-				<repo.path>${project.build.directory}/repository/</repo.path>
-			</properties>
+			<id>release-composite</id>
 			<build>
 				<plugins>
-					<!-- Upload the repo to the server -->
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0</version>
-						<executions>
-							<execution>
-								<id>upload-repo</id>
-								<phase>install</phase>
-								<goals>
-									<goal>upload</goal>
-								</goals>
-								<configuration>
-									<fromDir>${repo.path}</fromDir>
-									<includes>**</includes>
-									<toDir>${ftp.toDir}</toDir>
-									<url>${ftp.url}</url>
-									<serverId>p2Repo</serverId>
-								</configuration>
-							</execution>
-						</executions>
+ 						<groupId>org.codehaus.mojo</groupId>
+  						<artifactId>build-helper-maven-plugin</artifactId>
+  						<executions>
+    							<execution>
+      								<id>parse-version</id>
+      								<goals>
+        								<goal>parse-version</goal>
+      								</goals>
+    							</execution>
+  						</executions>
 					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>release</id>
-			<properties>
-				<url.suffix>stable</url.suffix>
-			</properties>
-			<build>
-				<plugins>
 					<plugin>
-						<groupId>de.jutzig</groupId>
-						<artifactId>github-release-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>github-upload</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>release</goal>
-								</goals>
-								<inherited>false</inherited>
-							</execution>
-						</executions>
-						<configuration>
-							<overwriteArtifact>true</overwriteArtifact>
-							<tag>${project.artifactId}-${project.version}</tag>
-							<releaseName>${project.artifactId}-${project.version}</releaseName>
-							<artifact>${project.build.directory}/${project.artifactId}-${project.version}.zip</artifact>
-						</configuration>
+  						<groupId>org.codehaus.mojo</groupId>
+  						<artifactId>exec-maven-plugin</artifactId>
+  						<configuration>
+    							<executable>git</executable>
+  						</configuration>
+  						<executions>
+    							<execution>
+      								<id>git-clone</id>
+      								<phase>prepare-package</phase>
+      								<goals>
+        								<goal>exec</goal>
+      								</goals>
+      								<configuration>
+        								<arguments>
+          									<argument>clone</argument>
+          									<argument>--depth=1</argument>
+          									<argument>-b</argument>
+          									<argument>main</argument>
+          									<argument>${github-update-repo}</argument>
+          									<argument>${github-local-clone}</argument>
+        								</arguments>
+      								</configuration>
+    							</execution>
+    							<execution>
+      								<id>git-add</id>
+      								<phase>verify</phase>
+      								<goals>
+        								<goal>exec</goal>
+      								</goals>
+      								<configuration>
+        								<arguments>
+          									<argument>-C</argument>
+          									<argument>${github-local-clone}</argument>
+          									<argument>add</argument>
+          									<argument>-A</argument>
+        								</arguments>
+      								</configuration>
+    							</execution>
+    							<execution>
+      								<id>git-commit</id>
+      								<phase>verify</phase>
+      								<goals>
+        								<goal>exec</goal>
+      								</goals>
+      								<configuration>
+        								<arguments>
+          									<argument>-C</argument>
+          									<argument>${github-local-clone}</argument>
+          									<argument>commit</argument>
+          									<argument>-m</argument>
+          									<argument>Release ${qualifiedVersion}</argument>
+        								</arguments>
+      								</configuration>
+    							</execution>
+    							<execution>
+      								<id>git-push</id>
+      								<phase>deploy</phase>
+      								<goals>
+        								<goal>exec</goal>
+      								</goals>
+      								<configuration>
+        								<arguments>
+          									<argument>-C</argument>
+          									<argument>${github-local-clone}</argument>
+          									<argument>push</argument>
+          									<argument>origin</argument>
+          									<argument>main</argument>
+        								</arguments>
+      								</configuration>
+    							</execution>
+  						</executions>
+					</plugin>
+					<plugin>
+  						<artifactId>maven-resources-plugin</artifactId>
+  						<executions>
+    							<execution>
+      								<id>copy-repository</id>
+      								<phase>package</phase>
+      								<goals>
+        								<goal>copy-resources</goal>
+      								</goals>
+      								<configuration>
+        								<outputDirectory>${current-release-directory}</outputDirectory>
+        								<resources>
+          									<resource>
+            										<directory>${project.build.directory}/repository</directory>
+          									</resource>
+        								</resources>
+      								</configuration>
+    							</execution>
+  						</executions>
+					</plugin>
+					<plugin>
+  						<groupId>org.eclipse.tycho.extras</groupId>
+  						<artifactId>tycho-eclipserun-plugin</artifactId>
+  						<version>${tycho-version}</version>
+  						<configuration>
+    							<repositories>
+      								<repository>
+        								<id>2025-03</id>
+        								<layout>p2</layout>
+        								<url>https://download.eclipse.org/releases/2025-03</url>
+      								</repository>
+    							</repositories>
+    							<dependencies>
+      								<dependency>
+        								<artifactId>org.eclipse.ant.core</artifactId>
+        								<type>eclipse-plugin</type>
+      								</dependency>
+      								<dependency>
+        								<artifactId>org.apache.ant</artifactId>
+        								<type>eclipse-plugin</type>
+      								</dependency>
+      								<dependency>
+        								<artifactId>org.eclipse.equinox.p2.repository.tools</artifactId>
+        								<type>eclipse-plugin</type>
+      								</dependency>
+      								<dependency>
+        								<artifactId>org.eclipse.equinox.p2.core.feature</artifactId>
+        								<type>eclipse-feature</type>
+      								</dependency>
+      								<dependency>
+        								<artifactId>org.eclipse.equinox.p2.extras.feature</artifactId>
+        								<type>eclipse-feature</type>
+      								</dependency>
+    							</dependencies>
+  						</configuration>
+  						<executions>
+    							<!-- add our new child repository -->
+    							<execution>
+      								<id>add-p2-composite-repository</id>
+      								<phase>package</phase>
+      								<goals>
+        								<goal>eclipse-run</goal>
+      								</goals>
+      								<configuration>
+        								<applicationsArgs>
+          									<args>-application</args>
+          									<args>org.eclipse.ant.core.antRunner</args>
+          									<args>-buildfile</args>
+          									<args>packaging-p2composite.ant</args>
+          									<args>p2.composite.add</args>
+          									<args>-Dsite.label="${site.label}"</args>
+          									<args>-Dcomposite.base.dir=${github-local-clone}</args>
+          									<args>-DunqualifiedVersion=${unqualifiedVersion}</args>
+          									<args>-DbuildQualifier=${buildQualifier}</args>
+          									<args>-DparsedVersion.majorVersion=${parsedVersion.majorVersion}</args>
+          									<args>-DparsedVersion.minorVersion=${parsedVersion.minorVersion}</args>
+        								</applicationsArgs>
+      								</configuration>
+    							</execution>
+  						</executions>
 					</plugin>
 				</plugins>
 			</build>

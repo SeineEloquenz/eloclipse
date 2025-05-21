@@ -7,13 +7,34 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<properties>
+        	<!-- Required properties for releasing -->
+		<github-update-repo>git@github.com:SeineEloquenz/p2.git</github-update-repo>
+		<github-local-clone>${project.build.directory}/checkout</github-local-clone>
+		<releases-directory>${github-local-clone}/releases</releases-directory>
+		<current-release-directory>${releases-directory}/${qualifiedVersion}</current-release-directory>
+		<!-- The label for the Composite sites -->
+		<site.label>JDT Codeminings</site.label>
+
+		<tycho-version>4.0.12</tycho-version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
-				<version>1.2.0</version>
+				<version>${tycho-version}</version>
 				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+  				<groupId>org.eclipse.tycho</groupId>
+  				<artifactId>tycho-packaging-plugin</artifactId>
+  				<version>${tycho-version}</version>
+  				<configuration>
+    					<format>'v'yyyyMMdd'-'HHmm</format>
+  				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -43,10 +64,36 @@
 		</repository>
 	</repositories>
 
+	<profiles>
+		<profile>
+  			<!-- Activate this profile to perform the release to GitHub Pages -->
+  			<id>release-composite</id>
+  			<build>
+      				<plugins>
+        				<plugin>
+          					<artifactId>maven-install-plugin</artifactId>
+          					<executions>
+            						<execution>
+              							<id>default-install</id>
+              							<phase>none</phase>
+            						</execution>
+          					</executions>
+        				</plugin>
+        				<plugin>
+          					<artifactId>maven-deploy-plugin</artifactId>
+          					<configuration>
+            						<skip>true</skip>
+          					</configuration>
+        				</plugin>
+      				</plugins>
+  			</build>
+		</profile>
+	</profiles>
+
 	<scm>
-		<url>https://github.com/angelozerr/jdt-codemining</url>
-		<connection>scm:git:https://github.com/angelozerr/jdt-codemining.git</connection>
-		<developerConnection>scm:git:https://github.com/angelozerr/jdt-codemining.git</developerConnection>
+		<url>https://github.com/SeineEloquenz/jdt-codemining</url>
+		<connection>scm:git:https://github.com/SeineEloquenz/jdt-codemining.git</connection>
+		<developerConnection>scm:git:https://github.com/SeineEloquenz/jdt-codemining.git</developerConnection>
 	</scm>
 
 </project>
