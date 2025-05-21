@@ -8,8 +8,9 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.experimental.ui.javaeditor.codemining.endstatement.EndStatementCodeMining;
 import org.eclipse.jdt.experimental.ui.javaeditor.codemining.methods.JavaMethodParameterCodeMining;
 import org.eclipse.jdt.experimental.ui.javaeditor.codemining.methods.MethodFilterManager;
@@ -130,13 +131,23 @@ public class JavaCodeMiningASTVisitor extends HierarchicalASTVisitor {
 	}
 
 	@Override
-	public boolean visit(SimpleType node) {
-		if (node.isVar() && showJava10VarType) {
-			JavaVarTypeCodeMining m = new JavaVarTypeCodeMining(node, viewer, provider);
-			minings.add(m);
-		}
-		return super.visit(node);
+    	public boolean visit(VariableDeclarationStatement declaration) {
+        	if (!showJava10VarType) {
+            		return super.visit(declaration);
+        	}
+
+        	if (declaration.getType().isVar()) {
+            		for (Object fragment : declaration.fragments()) {
+                		if (fragment instanceof VariableDeclarationFragment) {
+                    			JavaVarTypeCodeMining m = new JavaVarTypeCodeMining((VariableDeclarationFragment) fragment, viewer, provider);
+                    			minings.add(m);
+                		}
+            		}
+        	}
+
+        	return super.visit(declaration);
 	}
+
 
 	private static boolean isLiteral(Expression expression) {
 		switch (expression.getNodeType()) {
