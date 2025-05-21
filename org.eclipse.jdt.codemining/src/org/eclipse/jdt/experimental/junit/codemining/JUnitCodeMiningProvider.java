@@ -10,7 +10,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.experimental.junit.codemining.tester.JUnit3MethodTester;
 import org.eclipse.jdt.experimental.junit.codemining.tester.JUnit4MethodTester;
 import org.eclipse.jdt.experimental.junit.codemining.tester.JUnit5MethodTester;
 import org.eclipse.jdt.experimental.ui.preferences.JavaPreferencesPropertyTester;
@@ -130,7 +129,7 @@ public class JUnitCodeMiningProvider extends AbstractCodeMiningProvider {
 	}
 
 	private static boolean isTestMethod(IMethod method) {
-		return JUnit3MethodTester.INSTANCE.isTestMethod(method) || JUnit4MethodTester.INSTANCE.isTestMethod(method)
+		return JUnit4MethodTester.INSTANCE.isTestMethod(method)
 				|| JUnit5MethodTester.INSTANCE.isTestMethod(method);
 	}
 
