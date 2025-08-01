@@ -636,4 +636,34 @@ public class DeclaringType implements IType {
 		return null;
 	}
 
+	@Override
+	public String[] getPermittedSubtypeNames() throws JavaModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IField getRecordComponent(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isImplicitlyDeclared() throws JavaModelException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isRecord() throws JavaModelException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isSealed() throws JavaModelException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

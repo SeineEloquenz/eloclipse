@@ -381,4 +381,10 @@ public class MockMethod implements IMethod {
 		return false;
 	}
 
+	@Override
+	public boolean isMainMethodCandidate() throws JavaModelException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
