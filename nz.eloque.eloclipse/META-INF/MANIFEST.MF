@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eloclipse
+Bundle-SymbolicName: nz.eloque.eloclipse
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: nz.eloque.eloclipse.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide
+Automatic-Module-Name: nz.eloque.eloclipse
+Bundle-RequiredExecutionEnvironment: JavaSE-21
