@@ -1,4 +1,6 @@
-# jdt-codemining
+# Eloclipse
+
+Personal eclipse plugins containing some QOL features for java development.
 
 Eclipse plugin for `JDT Java Code Mining` and `Git Code Mining` (Experimental)
 
