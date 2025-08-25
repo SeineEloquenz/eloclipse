@@ -40,6 +40,7 @@
 	</build>
 
 	<modules>
+                <module>nz.eloque.eloclipse</module>
 		<module>org.eclipse.jdt.codemining</module>
 		<module>org.eclipse.jdt.codemining.tests</module>
 		<module>org.eclipse.egit.codemining</module>
